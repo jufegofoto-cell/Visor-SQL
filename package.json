@@ -10,8 +10,9 @@
   "scripts": {
     "start": "electron .",
     "validate": "node scripts/validate.js",
-    "dist": "electron-builder --win portable --x64 --publish never",
-    "dist:installer": "electron-builder --win nsis --x64 --publish never"
+    "dist": "electron-builder --win portable nsis --x64 --publish never",
+    "dist:installer": "electron-builder --win nsis --x64 --publish never",
+    "dist:portable": "electron-builder --win portable --x64 --publish never"
   },
   "devDependencies": {
     "electron": "^44.5.1",
@@ -40,6 +41,12 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "build/icon.ico"
@@ -51,7 +58,15 @@
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
-      "artifactName": "VisorSQL-EnergyPlus-${version}-setup-x64.exe"
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Visor SQL EnergyPlus",
+      "uninstallDisplayName": "Visor SQL EnergyPlus ${version}",
+      "installerLanguages": [
+        "es_ES"
+      ],
+      "language": "3082",
+      "artifactName": "VisorSQL-EnergyPlus-${version}-instalador-x64.exe"
     }
   }
 }

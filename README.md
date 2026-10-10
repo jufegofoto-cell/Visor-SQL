@@ -23,17 +23,20 @@ scripts/validate.js                Validación previa a la compilación
    git tag v2.4.0
    git push origin v2.4.0
    ```
-3. **Prueba sin publicar:** pestaña *Actions* → *Compilar Windows x64* → *Run workflow*. El `.exe` queda en *Artifacts* de esa ejecución.
+3. **Prueba sin publicar:** pestaña *Actions* → *Compilar Windows x64* → *Run workflow*. Los `.exe` quedan en *Artifacts* de esa ejecución.
 
-Resultado: `VisorSQL-EnergyPlus-<versión>-portable-x64.exe` (no requiere instalación).
+Resultado, dos archivos:
+- `VisorSQL-EnergyPlus-<versión>-portable-x64.exe`: se ejecuta con doble clic, sin instalación (ideal para USB).
+- `VisorSQL-EnergyPlus-<versión>-instalador-x64.exe`: instala en la carpeta del usuario (o la que se elija), crea accesos directos en el escritorio y el menú Inicio y se desinstala desde *Configuración → Aplicaciones* de Windows.
 
 ## Compilar localmente (Windows)
 
 ```
 npm ci
 npm start                 # abre el visor
-npm run dist              # ejecutable portable en dist/
-npm run dist:installer    # instalador NSIS opcional
+npm run dist              # portable + instalador en dist/
+npm run dist:portable     # solo el portable
+npm run dist:installer    # solo el instalador
 ```
 
 ## Notas
