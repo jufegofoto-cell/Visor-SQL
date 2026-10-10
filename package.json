@@ -1,7 +1,7 @@
 {
   "name": "visor-sql-energyplus",
   "productName": "Visor SQL EnergyPlus",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Visor offline de resultados SQL de EnergyPlus / OpenStudio (también EPW y CSV), con funciones estilo DView.",
   "main": "main.js",
   "author": "jufegofoto-cell",

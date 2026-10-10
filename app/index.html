@@ -141,7 +141,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white text-lg font-bold">▣</div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900">EP/OS SQL Data Viewer <span class="text-xs text-emerald-700 font-normal">V2.4 · offline</span></h1>
+                <h1 class="text-xl font-bold text-slate-900">EP/OS SQL Data Viewer <span class="text-xs text-emerald-700 font-normal">V2.5 · offline</span></h1>
                 <p class="text-xs text-slate-600">Visualizador de simulaciones EnergyPlus &amp; OpenStudio · SQL / EPW / CSV</p>
             </div>
         </div>
@@ -433,7 +433,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
                             <div class="flex-1 relative"><div id="vp-dd-summer"></div></div>
                             <button id="btn-dd-summer" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-sm">☀</button>
                         </div>
-                        <div id="summer-dd-chart" style="height:300px"></div>
+                        <label class="flex items-center gap-2 text-xs text-slate-600 mb-2"><input type="checkbox" id="dd-summer-out" class="accent-amber-600" checked> Mostrar temperatura exterior del día de diseño</label>
+                        <div id="summer-dd-chart" style="height:400px"></div>
+                        <div id="summer-dd-info"></div>
+                        <details class="mt-3 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-3" open>
+                            <summary class="cursor-pointer font-semibold text-slate-700">Cómo leer esta gráfica</summary>
+                            <ul class="mt-2 space-y-1 list-disc pl-4">
+                                <li><b>Eje horizontal:</b> hora del día, de 00 a 24 h. Cada punto se ubica al <i>inicio</i> de su intervalo (EnergyPlus reporta el final).</li>
+                                <li><b>Eje vertical:</b> valor de la variable elegida, en sus unidades.</li>
+                                <li><b>Cada línea continua</b> es un día de diseño del modelo, con su nombre en la leyenda. Si hay varios (p. ej. 0,4 % y 1 %), aparecen como curvas separadas.</li>
+                                <li><b>▲ / ▼</b> marcan el máximo y el mínimo de cada curva; el resumen bajo la gráfica da sus valores, la hora en que ocurren, el promedio y la oscilación diaria.</li>
+                                <li><b>Línea punteada:</b> temperatura exterior de bulbo seco de ese mismo día de diseño, con el color de su curva (eje derecho si la unidad es distinta).</li>
+                                <li><b>Qué es un día de diseño:</b> un día sintético, no un día real del clima, definido para dimensionar equipos. En verano, «Clg 0.4%» significa que la temperatura máxima de ese día solo se supera el 0,4 % de las horas del año (unas 35 h): es una condición calurosa extrema para dimensionar enfriamiento.</li>
+                            </ul>
+                        </details>
                     </div>
                     <div class="glass rounded-xl p-4">
                         <h3 class="text-lg font-semibold mb-3">Día de Diseño Invierno</h3>
@@ -441,7 +454,20 @@ Check your Browserslist config to be sure that your targets are set up correctly
                             <div class="flex-1 relative"><div id="vp-dd-winter"></div></div>
                             <button id="btn-dd-winter" class="bg-sky-600 hover:bg-sky-500 text-white px-3 py-2 rounded-lg text-sm">❄</button>
                         </div>
-                        <div id="winter-dd-chart" style="height:300px"></div>
+                        <label class="flex items-center gap-2 text-xs text-slate-600 mb-2"><input type="checkbox" id="dd-winter-out" class="accent-sky-600" checked> Mostrar temperatura exterior del día de diseño</label>
+                        <div id="winter-dd-chart" style="height:400px"></div>
+                        <div id="winter-dd-info"></div>
+                        <details class="mt-3 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-3" open>
+                            <summary class="cursor-pointer font-semibold text-slate-700">Cómo leer esta gráfica</summary>
+                            <ul class="mt-2 space-y-1 list-disc pl-4">
+                                <li><b>Eje horizontal:</b> hora del día, de 00 a 24 h. Cada punto se ubica al <i>inicio</i> de su intervalo (EnergyPlus reporta el final).</li>
+                                <li><b>Eje vertical:</b> valor de la variable elegida, en sus unidades.</li>
+                                <li><b>Cada línea continua</b> es un día de diseño del modelo, con su nombre en la leyenda. Si hay varios (p. ej. 0,4 % y 1 %), aparecen como curvas separadas.</li>
+                                <li><b>▲ / ▼</b> marcan el máximo y el mínimo de cada curva; el resumen bajo la gráfica da sus valores, la hora en que ocurren, el promedio y la oscilación diaria.</li>
+                                <li><b>Línea punteada:</b> temperatura exterior de bulbo seco de ese mismo día de diseño, con el color de su curva (eje derecho si la unidad es distinta).</li>
+                                <li><b>Qué es un día de diseño:</b> un día sintético, no un día real del clima, definido para dimensionar equipos. En invierno, «Htg 99.6%» significa que la temperatura de ese día se supera el 99,6 % de las horas del año: solo el 0,4 % de las horas son más frías. Es la condición fría extrema para dimensionar calefacción; en climas cálidos sirve para revisar el comportamiento nocturno y de madrugada.</li>
+                            </ul>
+                        </details>
                     </div>
                 </div>
                 <div class="glass rounded-xl p-4 mt-6">
@@ -585,20 +611,32 @@ Check your Browserslist config to be sure that your targets are set up correctly
                 <div class="glass rounded-xl p-4 mb-4">
                     <div class="flex flex-wrap items-end gap-4">
                         <div class="w-96">
-                            <label class="block text-sm text-slate-600 mb-1">Nombre de variable (compara todas sus claves/zonas)</label>
+                            <label class="block text-sm text-slate-600 mb-1">Nombre de variable (elija abajo las zonas/claves)</label>
                             <input type="text" id="zones-name" list="zones-names" placeholder="ej. Zone Mean Air Temperature" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm">
                             <datalist id="zones-names"></datalist>
                         </div>
                         <div class="w-44">
                             <label class="block text-sm text-slate-600 mb-1">Tipo</label>
                             <select id="zones-plot-type" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm">
-                                <option value="box">Box plot</option>
+                                <option value="box">Diagrama de caja</option>
                                 <option value="bar">Barras (promedio)</option>
+                                <option value="curves">Curvas en el tiempo</option>
+                                <option value="profile">Perfil diario promedio</option>
                             </select>
                         </div>
+                        <label id="zc-panels-wrap" class="flex items-center gap-2 text-sm text-slate-700 pb-2 opacity-40"><input type="checkbox" id="zc-panels" class="accent-sky-500" disabled> Un panel por zona</label>
                         <button id="btn-zones-update" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm font-medium">↻ Graficar</button>
                     </div>
-                    <p class="text-xs text-slate-500 mb-2">Nota: el archivo SQL de EnergyPlus no almacena coordenadas de vértices, por lo que no es posible reconstruir el modelo 3D real desde el SQL. Esta pestaña compara la distribución de una variable entre zonas/claves (máx. 40).</p>
+                    <div class="mt-4">
+                        <div class="flex flex-wrap items-center gap-3 mb-2">
+                            <span class="text-sm text-slate-600">Zonas / claves a comparar</span>
+                            <input type="text" id="zc-filter" placeholder="Filtrar zonas..." class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm w-56 py-1">
+                            <button id="zc-all" type="button" class="text-xs text-sky-700 hover:underline">Seleccionar visibles</button>
+                            <button id="zc-none" type="button" class="text-xs text-sky-700 hover:underline">Ninguna</button>
+                            <span id="zc-count" class="text-xs text-slate-500"></span>
+                        </div>
+                        <div id="zc-zones" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto scrollbar-thin"></div>
+                    </div>
                 </div>
                 <div class="glass rounded-xl p-4">
                     <div id="zones-plot" style="height:520px"></div>
@@ -609,7 +647,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
             <div id="tab-about" class="tab-content hidden fade-in">
                 <div class="glass rounded-xl p-6 mb-4">
                     <h2 class="text-2xl font-bold text-slate-900 mb-1">Acerca del visor</h2>
-                    <p class="text-sm text-slate-600 mb-4">EP/OS SQL Data Viewer <span id="about-version">v2.4</span> · visor offline de resultados de simulación térmica</p>
+                    <p class="text-sm text-slate-600 mb-4">EP/OS SQL Data Viewer <span id="about-version">v2.5</span> · visor offline de resultados de simulación térmica</p>
                     <p class="text-slate-700 leading-relaxed max-w-4xl">
                         Lee el archivo <code class="bg-slate-100 px-1 rounded">eplusout.sql</code> que generan EnergyPlus y OpenStudio
                         (también archivos climáticos <b>EPW</b> y tablas <b>CSV</b>) y lo grafica sin conexión a internet.
@@ -643,7 +681,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     </a>
                     <a href="#" data-goto="profiles" class="glass rounded-xl p-4 block hover:border-sky-400">
                         <h4 class="font-semibold text-sky-800 mb-1">◫ Perfiles &amp; Días Diseño</h4>
-                        <p class="text-sm text-slate-700"><b>Perfil diario promedio por mes</b> en 12 paneles (como el Profile de DView) o en curvas superpuestas, con la curva promedio anual y una segunda variable en el eje derecho. <b>Días de diseño</b> de verano e invierno: la variable durante el día de diseño. <b>Perfil típico por tipo de día</b> (lunes a domingo, festivo, días de diseño) con promedio, mínimo y máximo por hora.</p>
+                        <p class="text-sm text-slate-700"><b>Perfil diario promedio por mes</b> en 12 paneles (como el Profile de DView) o en curvas superpuestas, con la curva promedio anual y una segunda variable en el eje derecho. <b>Días de diseño</b> de verano e invierno: la variable hora a hora durante cada día de diseño del modelo (una curva por día), con la temperatura exterior, marcas de máximo y mínimo, tabla resumen y una guía de lectura. <b>Perfil típico por tipo de día</b> (lunes a domingo, festivo, días de diseño) con promedio, mínimo y máximo por hora.</p>
                     </a>
                     <a href="#" data-goto="statistics" class="glass rounded-xl p-4 block hover:border-sky-400">
                         <h4 class="font-semibold text-sky-800 mb-1">∑ Estadísticas</h4>
@@ -659,7 +697,7 @@ Check your Browserslist config to be sure that your targets are set up correctly
                     </a>
                     <a href="#" data-goto="zones" class="glass rounded-xl p-4 block hover:border-sky-400">
                         <h4 class="font-semibold text-sky-800 mb-1">⬒ Comparación Zonas</h4>
-                        <p class="text-sm text-slate-700">Para un nombre de variable, compara todas sus claves (zonas, superficies, equipos) con diagramas de caja o barras del promedio. Útil para identificar las zonas más cálidas, con más horas de sobrecalentamiento o mayor consumo.</p>
+                        <p class="text-sm text-slate-700">Para un nombre de variable, elija qué claves comparar (zonas, superficies, equipos): todas o solo algunas, con filtro por nombre. Tipos: diagrama de caja, barras del promedio, curvas en el tiempo y perfil diario promedio; las curvas y perfiles pueden verse en un solo gráfico o en un panel por zona con la misma escala. Útil para identificar las zonas más cálidas o de mayor consumo.</p>
                     </a>
                     <a href="#" data-goto="tabular" class="glass rounded-xl p-4 block hover:border-sky-400">
                         <h4 class="font-semibold text-sky-800 mb-1">≡ Datos Tabulares</h4>
@@ -967,6 +1005,60 @@ const DARK_LAYOUT = {
     margin: { t: 36, r: 70, b: 50, l: 65 }
 };
 
+// ---------- Layout seguro: títulos, etiquetas y leyendas fuera del área de trazado ----------
+// Se aplica a TODOS los gráficos: los ejes reservan espacio para sus etiquetas (automargin),
+// el título va arriba en su propio margen y la leyenda abajo (o a la derecha si hay muchas series).
+// Parte un título largo en varias líneas para que nunca se recorte ni invada el gráfico
+function wrapTitle(text, width, px) {
+    const max = Math.max(24, Math.floor((width - 20) / (px * 0.56)));
+    if (!text || text.replace(/<[^>]+>/g, '').length <= max || /<br>/i.test(text)) return text;
+    const parts = text.split(/(?= · | — | \()/);
+    const lines = []; let cur = '';
+    parts.forEach(p => {
+        if (cur && (cur + p).replace(/<[^>]+>/g, '').length > max) { lines.push(cur); cur = p.replace(/^ · | ^— /, '').replace(/^ /, ''); }
+        else cur += p;
+    });
+    if (cur) lines.push(cur);
+    return lines.join('<br>');
+}
+function fixLayout(L, data, gd) {
+    L = L || {};
+    Object.keys(L).forEach(k => {
+        if (!/^[xy]axis\d*$/.test(k) || !L[k]) return;
+        const ax = L[k];
+        ax.automargin = true;
+        if (typeof ax.title === 'string') ax.title = { text: ax.title };
+        if (ax.title && ax.title.text) ax.title.standoff = ax.title.standoff ?? 10;
+    });
+    if (!L.xaxis) L.xaxis = { automargin: true };
+    if (!L.yaxis) L.yaxis = { automargin: true };
+    L.margin = Object.assign({ t: 24, r: 30, b: 30, l: 50 }, L.margin || {});
+    if (typeof L.title === 'string') L.title = { text: L.title };
+    if (L.title && L.title.text) {
+        const el = typeof gd === 'string' ? document.getElementById(gd) : gd;
+        const px = (L.title.font && L.title.font.size) || 14;
+        const text = wrapTitle(L.title.text, (el && el.clientWidth) || 800, px);
+        const nl = (text.match(/<br>/gi) || []).length;
+        const padT = 8 + nl * px; // con varias líneas Plotly sube el bloque: se compensa para que no se recorte
+        L.title = Object.assign({}, L.title, { text, x: 0, xref: 'paper', xanchor: 'left', y: 1, yref: 'container', yanchor: 'top', pad: { t: padT }, automargin: true });
+        L.margin.t = Math.max(L.margin.t, Math.round(padT + (nl + 1) * px * 1.3 + 14));
+    }
+    const nLeg = (data || []).filter(t => t && t.showlegend !== false && t.name).length;
+    const showLeg = L.showlegend !== undefined ? L.showlegend : nLeg > 1;
+    if (showLeg && L.legend && L.legend.orientation === 'h') {
+        const rightAxis = Object.keys(L).some(k => /^yaxis\d*$/.test(k) && L[k] && L[k].side === 'right');
+        if (nLeg > 10 && !rightAxis) L.legend = Object.assign({}, L.legend, { orientation: 'v', x: 1.02, xanchor: 'left', xref: 'paper', y: 1, yref: 'paper', yanchor: 'top' });
+        else L.legend = Object.assign({}, L.legend, { x: 0, xanchor: 'left', xref: 'paper', y: 0, yref: 'container', yanchor: 'bottom' });
+    }
+    // Anotaciones de rótulo en papel por encima del área (p. ej. "Ene" en paneles) no deben tocar los ticks
+    return L;
+}
+(function wrapPlotly() {
+    const r = Plotly.react.bind(Plotly), n = Plotly.newPlot.bind(Plotly);
+    Plotly.react = (gd, data, layout, cfg) => r(gd, data, fixLayout(layout, data, gd), cfg);
+    Plotly.newPlot = (gd, data, layout, cfg) => n(gd, data, fixLayout(layout, data, gd), cfg);
+})();
+
 // ---------- Utilidades ----------
 function esc(s) {
     return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -1032,6 +1124,11 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-dur-update').addEventListener('click', updateDurationCurve);
     document.getElementById('btn-scatter-update').addEventListener('click', updateScatter);
     document.getElementById('btn-zones-update').addEventListener('click', updateZonesPlot);
+    ['input', 'change'].forEach(ev => document.getElementById('zones-name').addEventListener(ev, () => renderZoneCmpChips(true)));
+    document.getElementById('zc-filter').addEventListener('input', () => renderZoneCmpChips(false));
+    document.getElementById('zc-all').addEventListener('click', () => { zcVisible().forEach(v => ZC.selected.add(v.id)); renderZoneCmpChips(false); });
+    document.getElementById('zc-none').addEventListener('click', () => { ZC.selected.clear(); renderZoneCmpChips(false); });
+    document.getElementById('zones-plot-type').addEventListener('change', syncZoneCmpOptions);
     document.getElementById('btn-tabular-load').addEventListener('click', loadTabularData);
     document.getElementById('tab-report').addEventListener('change', updateTableSelect);
 
@@ -1735,6 +1832,7 @@ function finalizeLoad() {
     fillDayTypeSelect(null);
     syncAggregationOptions(null);
     document.getElementById('zones-names').innerHTML = zoneComparableNames().map(n => `<option value="${esc(n)}">`).join('');
+    ZC.name = null; ZC.selected.clear(); renderZoneCmpChips(true);
     Object.keys(checklists).forEach(k => renderCheckList(k));
     populateTabularSelects();
     fillZoneTempUI();
@@ -2256,21 +2354,77 @@ function updateMonthlyProfiles() {
 }
 
 // ---------- Días de diseño ----------
+function envName(idx) {
+    const e = App.envPeriods.find(p => p.index == idx);
+    return e ? (e.name || 'Periodo ' + idx) : 'Periodo ' + idx;
+}
+// Hora de inicio del intervalo en horas decimales (0–24)
+function startHour(t) {
+    const end = t.hour * 60 + t.minute;
+    const iv = t.intervalMin ? Math.min(t.intervalMin, 60) : 60;
+    return Math.max(0, end - iv) / 60;
+}
+function hhmm(h) { const m = Math.round(h * 60); return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); }
 function loadDesignDay(dayType) {
-    const pickerId = dayType === 'SummerDesignDay' ? 'vp-dd-summer' : 'vp-dd-winter';
-    const plotId = dayType === 'SummerDesignDay' ? 'summer-dd-chart' : 'winter-dd-chart';
+    const summer = dayType === 'SummerDesignDay';
+    const pickerId = summer ? 'vp-dd-summer' : 'vp-dd-winter';
+    const plotId = summer ? 'summer-dd-chart' : 'winter-dd-chart';
+    const infoId = summer ? 'summer-dd-info' : 'winter-dd-info';
     const varDef = getPickerVar(pickerId);
     if (!varDef) { showToast('Seleccione una variable', 'error'); return; }
     const rows = fetchSeries(varDef.id, null).filter(r => r.t.dayType === dayType);
-    if (!rows.length) { showToast(`No hay datos de ${dayType === 'SummerDesignDay' ? 'día de diseño de verano' : 'día de diseño de invierno'}`, 'error'); return; }
-    const few = rows.length < 4;
-    Plotly.react(plotId, [{
-        x: rows.map(r => varDef.subdaily ? r.t.label.slice(6) : `${varDef.freqLabel} (${r.t.label.slice(0, 5)})`), y: rows.map(r => r.value),
-        type: few ? 'bar' : 'scatter', mode: 'lines', fill: few ? undefined : 'tozeroy', width: few ? 0.4 : undefined,
-        marker: { color: dayType === 'SummerDesignDay' ? '#f59e0b' : '#0ea5e9' },
-        line: { color: dayType === 'SummerDesignDay' ? '#f59e0b' : '#0ea5e9', width: 2 },
-        fillcolor: dayType === 'SummerDesignDay' ? 'rgba(245,158,11,0.1)' : 'rgba(14,165,233,0.1)'
-    }], darkLayout({ yaxis: { title: varDef.units || '' }, xaxis: { nticks: 12 } }), PLOTLY_CFG);
+    if (!rows.length) { showToast(`No hay datos de ${summer ? 'día de diseño de verano' : 'día de diseño de invierno'}`, 'error'); return; }
+    // Un modelo puede tener varios días de diseño del mismo tipo (p. ej. 0,4 % y 1 %):
+    // cada uno es una curva independiente, nunca se unen en una sola línea
+    const byEnv = new Map();
+    rows.forEach(r => { if (!byEnv.has(r.t.envIndex)) byEnv.set(r.t.envIndex, []); byEnv.get(r.t.envIndex).push(r); });
+    const pal = summer ? ['#d97706', '#dc2626', '#9333ea', '#be185d', '#a16207'] : ['#0369a1', '#4f46e5', '#0d9488', '#1d4ed8', '#64748b'];
+    const traces = [], summary = [];
+    let k = 0;
+    byEnv.forEach((rr, env) => {
+        const col = pal[k++ % pal.length];
+        const x = rr.map(r => varDef.subdaily ? startHour(r.t) : 12), y = rr.map(r => r.value);
+        let iMax = 0, iMin = 0;
+        y.forEach((v, i) => { if (v > y[iMax]) iMax = i; if (v < y[iMin]) iMin = i; });
+        const name = envName(env);
+        traces.push({ x, y, type: 'scatter', mode: varDef.subdaily ? 'lines' : 'markers', name, line: { color: col, width: 2.4, shape: varDef.subdaily && rr.length <= 24 ? 'hv' : 'linear' },
+            marker: { color: col, size: 10 }, hovertemplate: `<b>${esc(name)}</b><br>%{customdata}<br>%{y:.2f} ${esc(varDef.units || '')}<extra></extra>`,
+            customdata: x.map(h => varDef.subdaily ? hhmm(h) + '–' + hhmm(Math.min(24, h + (rr[0].t.intervalMin ? Math.min(rr[0].t.intervalMin, 60) : 60) / 60)) : 'valor del día') });
+        if (varDef.subdaily) traces.push({ x: [x[iMax], x[iMin]], y: [y[iMax], y[iMin]], type: 'scatter', mode: 'markers', showlegend: false, hoverinfo: 'skip',
+            marker: { color: col, size: 11, symbol: ['triangle-up', 'triangle-down'], line: { color: '#ffffff', width: 1 } } });
+        const mean = y.reduce((a, b) => a + b, 0) / y.length;
+        summary.push({ name, col, max: y[iMax], hMax: x[iMax], min: y[iMin], hMin: x[iMin], mean, n: y.length });
+    });
+    // Referencia: temperatura exterior del mismo día de diseño
+    const units = varDef.units || '';
+    let y2 = false;
+    const out = document.getElementById(summer ? 'dd-summer-out' : 'dd-winter-out').checked ? outdoorTempVar() : null;
+    if (out && out.id !== varDef.id) {
+        const orows = fetchSeries(out.id, null).filter(r => r.t.dayType === dayType && byEnv.has(r.t.envIndex));
+        const oEnv = new Map();
+        orows.forEach(r => { if (!oEnv.has(r.t.envIndex)) oEnv.set(r.t.envIndex, []); oEnv.get(r.t.envIndex).push(r); });
+        y2 = (out.units || '') !== units;
+        let j = 0;
+        oEnv.forEach((rr, env) => {
+            traces.push({ x: rr.map(r => startHour(r.t)), y: rr.map(r => r.value), type: 'scatter', mode: 'lines', name: 'Exterior (punteada, color de su día)',
+                showlegend: j === 0, legendgroup: 'ext', yaxis: y2 ? 'y2' : 'y', line: { color: pal[j++ % pal.length], width: 1.4, dash: 'dot' },
+                hovertemplate: `Exterior<br>%{y:.1f} ${esc(out.units || '')}<extra></extra>` });
+        });
+    }
+    const layout = darkLayout({
+        margin: { t: 16, r: y2 ? 50 : 16, b: 30, l: 50 },
+        xaxis: { title: 'Hora del día (inicio del intervalo)', range: [0, 24], dtick: 3, tickvals: [0, 3, 6, 9, 12, 15, 18, 21, 24], ticktext: ['00', '03', '06', '09', '12', '15', '18', '21', '24'] },
+        yaxis: { title: units || '-', autorange: true, rangemode: 'normal' },
+        showlegend: true, legend: { orientation: 'h', font: { size: 10 } }
+    });
+    if (y2) layout.yaxis2 = { overlaying: 'y', side: 'right', title: `Exterior (${out.units})`, gridcolor: 'rgba(0,0,0,0)', tickfont: { color: '#64748b' } };
+    Plotly.react(plotId, traces, layout, PLOTLY_CFG);
+    const u = esc(units);
+    document.getElementById(infoId).innerHTML = `<div class="text-xs text-slate-500 mt-1 mb-1">${esc(varDef.name)} [${esc(varDef.keyValue)}]</div>` +
+        summary.map(s => `<div class="text-xs border-t border-slate-100 py-1.5">
+            <div class="font-medium text-slate-800 truncate" title="${esc(s.name)}"><span class="inline-block w-4 h-1 rounded align-middle mr-1.5" style="background:${s.col}"></span>${esc(s.name)}</div>
+            <div class="text-slate-600 mt-0.5 pl-6"><span class="text-rose-700">▲ ${fmt(s.max, 1)} ${u}</span>${varDef.subdaily ? ' a las ' + hhmm(s.hMax) : ''} ·
+            <span class="text-sky-700">▼ ${fmt(s.min, 1)} ${u}</span>${varDef.subdaily ? ' a las ' + hhmm(s.hMin) : ''} · promedio ${fmt(s.mean, 1)} · oscilación ${fmt(s.max - s.min, 1)} ${u}</div></div>`).join('');
 }
 
 function updateDayTypeProfile() {
@@ -2622,46 +2776,125 @@ function updateScatter() {
 }
 
 // ---------- Comparación por zonas / claves ----------
+const ZC = { name: null, selected: new Set() };
+function zcEntries() {
+    const name = document.getElementById('zones-name').value;
+    return App.variables.filter(v => v.name === name)
+        .sort((a, b) => String(a.keyValue).localeCompare(String(b.keyValue), undefined, { numeric: true }) || a.freqRank - b.freqRank);
+}
+function zcLabel(v, multi) { return (v.keyValue || ('id' + v.id)) + (multi ? ` (${v.freqLabel})` : ''); }
+function zcVisible() {
+    const f = (document.getElementById('zc-filter').value || '').toLowerCase().trim();
+    return zcEntries().filter(v => !f || f.split(/\s+/).every(w => (v.keyValue + ' ' + v.freqLabel).toLowerCase().includes(w)));
+}
+function renderZoneCmpChips(reset) {
+    const entries = zcEntries();
+    const name = document.getElementById('zones-name').value;
+    if (reset && name !== ZC.name) {
+        ZC.name = name; ZC.selected.clear();
+        entries.slice(0, 12).forEach(v => ZC.selected.add(v.id)); // por defecto las primeras 12
+        document.getElementById('zc-filter').value = '';
+    }
+    const multi = new Set(entries.map(v => v.freq)).size > 1;
+    const box = document.getElementById('zc-zones');
+    const vis = zcVisible();
+    box.innerHTML = !entries.length ? '<span class="text-xs text-slate-500">Escriba o elija un nombre de variable para ver sus zonas/claves</span>'
+        : vis.map(v => {
+            const on = ZC.selected.has(v.id);
+            return `<button type="button" data-id="${v.id}" class="zc-chip text-xs px-2.5 py-1 rounded-full border ${on ? 'border-sky-500 bg-sky-100 text-sky-800' : 'border-slate-300 text-slate-500'}">${esc(zcLabel(v, multi))}</button>`;
+        }).join('') || '<span class="text-xs text-slate-500">Sin coincidencias</span>';
+    box.querySelectorAll('.zc-chip').forEach(b => b.addEventListener('click', () => {
+        const id = parseInt(b.dataset.id);
+        if (ZC.selected.has(id)) ZC.selected.delete(id); else ZC.selected.add(id);
+        renderZoneCmpChips(false);
+    }));
+    document.getElementById('zc-count').textContent = entries.length ? `${[...ZC.selected].filter(id => entries.some(v => v.id === id)).length} de ${entries.length} seleccionadas` : '';
+}
+function syncZoneCmpOptions() {
+    const t = document.getElementById('zones-plot-type').value;
+    document.getElementById('zc-panels-wrap').classList.toggle('opacity-40', !(t === 'curves' || t === 'profile'));
+    document.getElementById('zc-panels').disabled = !(t === 'curves' || t === 'profile');
+}
 function updateZonesPlot() {
     const name = document.getElementById('zones-name').value;
     if (!name) { showToast('Escriba o seleccione un nombre de variable', 'error'); return; }
     const plotType = document.getElementById('zones-plot-type').value;
-    const entries = App.variables.filter(v => v.name === name)
-        .sort((a, b) => String(a.keyValue).localeCompare(String(b.keyValue), undefined, { numeric: true }) || a.freqRank - b.freqRank);
-    if (!entries.length) { showToast('Variable no encontrada en el archivo', 'error'); return; }
+    const all = zcEntries();
+    if (!all.length) { showToast('Variable no encontrada en el archivo', 'error'); return; }
+    if (ZC.name !== name) renderZoneCmpChips(true);
+    const entries = all.filter(v => ZC.selected.has(v.id));
+    if (!entries.length) { showToast('Seleccione al menos una zona/clave', 'error'); return; }
+    const multi = new Set(all.map(v => v.freq)).size > 1;
+    const panels = document.getElementById('zc-panels').checked && (plotType === 'curves' || plotType === 'profile') && entries.length > 1;
     // Claves con distinta frecuencia se agregan al paso más grueso para que sean comparables
-    const level = commonLevel(entries);
-    if (entries.length < 2) { showToast('Esta variable solo tiene una clave/zona con datos', 'info'); }
+    let level = commonLevel(entries);
+    if (plotType === 'curves') level = commonLevel(entries) === 'native' && entries[0].subdaily ? 'daily' : level === 'native' ? 'native' : level;
+    const units = entries[0].units || '';
     showLoading('Comparando zonas...');
     setTimeout(() => {
+        const el = document.getElementById('zones-plot');
         const traces = [];
-        const multiFreq = new Set(entries.map(v => v.freq)).size > 1;
         entries.forEach((v, i) => {
             const raw = fetchSeries(v.id, envFor(v));
-            const rows = level === 'native' ? raw : aggregateToDates(raw, level, effMode(v, 'auto')).map(p => ({ value: p.y }));
-            if (!rows.length) return;
-            const label = (v.keyValue || ('id' + v.id)) + (multiFreq ? ` (${v.freqLabel})` : '');
-            if (plotType === 'box') {
-                // muestreo para rendimiento
-                let vals = rows.map(r => r.value);
-                if (vals.length > 5000) {
-                    const step = vals.length / 5000, sampled = [];
-                    for (let j = 0; j < vals.length; j += step) sampled.push(vals[Math.floor(j)]);
-                    vals = sampled;
+            if (!raw.length) return;
+            const label = zcLabel(v, multi), color = PALETTE[i % PALETTE.length];
+            const ax = panels ? (i === 0 ? '' : String(i + 1)) : '';
+            if (plotType === 'curves') {
+                const pts = aggregateToDates(raw, level, effMode(v, 'auto'));
+                traces.push({ x: pts.map(p => p.x), y: pts.map(p => p.y), type: 'scatter', mode: 'lines', name: label, line: { color, width: 1.5 },
+                    xaxis: 'x', yaxis: 'y' + ax, hovertemplate: `%{x|%d %b}<br>%{y:.2f} ${esc(units)}<extra>${esc(label)}</extra>` });
+            } else if (plotType === 'profile') {
+                let x, y;
+                if (v.subdaily) {
+                    const b = Array.from({ length: 24 }, () => ({ s: 0, n: 0 }));
+                    raw.forEach(r => { const k = b[r.t.hourIdx]; k.s += r.value; k.n++; });
+                    x = [...Array(24).keys()]; y = b.map(k => k.n ? k.s / k.n : null);
+                } else {
+                    x = [...Array(24).keys()]; const m = raw.reduce((a, r) => a + r.value, 0) / raw.length; y = x.map(() => m);
                 }
-                traces.push({ y: vals, type: 'box', name: label, marker: { color: PALETTE[i % PALETTE.length] }, boxpoints: vals.length < 40 ? 'all' : false });
+                traces.push({ x, y, type: 'scatter', mode: 'lines', name: label + (v.subdaily ? '' : ' (promedio, sin resolución horaria)'), line: { color, width: 1.8, dash: v.subdaily ? 'solid' : 'dot' },
+                    xaxis: 'x', yaxis: 'y' + ax, hovertemplate: `%{x}:00 · %{y:.2f} ${esc(units)}<extra>${esc(label)}</extra>` });
             } else {
-                const mean = rows.reduce((a, r) => a + r.value, 0) / rows.length;
-                traces.push({ x: [label], y: [mean], type: 'bar', name: label, marker: { color: PALETTE[i % PALETTE.length] }, showlegend: false });
+                const rows = level === 'native' ? raw.map(r => r.value) : aggregateToDates(raw, level, effMode(v, 'auto')).map(p => p.y);
+                if (plotType === 'box') {
+                    let vals = rows;
+                    if (vals.length > 5000) { const step = vals.length / 5000, sm = []; for (let j = 0; j < vals.length; j += step) sm.push(vals[Math.floor(j)]); vals = sm; }
+                    traces.push({ y: vals, type: 'box', name: label, marker: { color }, boxpoints: vals.length < 40 ? 'all' : false, boxmean: true });
+                } else {
+                    const mean = rows.reduce((a, b) => a + b, 0) / rows.length;
+                    traces.push({ x: [label], y: [mean], type: 'bar', name: label, marker: { color }, showlegend: false, text: [fmt(mean, 1)], textposition: 'outside' });
+                }
             }
         });
         if (!traces.length) { hideLoading(); showToast('Sin datos', 'error'); return; }
-        Plotly.react('zones-plot', traces, darkLayout({
-            title: { text: `${esc(name)} — comparación por clave/zona (${entries.length} series${level !== 'native' ? ', agregadas a paso ' + LEVEL_ES[level] : ''})`, font: { size: 13 } },
-            yaxis: { title: entries[0].units || '' },
-            xaxis: { tickangle: -45, automargin: true },
-            showlegend: plotType === 'box' && traces.length <= 30
-        }), PLOTLY_CFG);
+        const kind = { box: 'distribución (caja)', bar: 'promedio', curves: `curvas (${LEVEL_ES[level]})`, profile: 'perfil diario promedio' }[plotType];
+        const layout = darkLayout({
+            title: { text: `${esc(name)} — ${kind} · ${entries.length} de ${all.length} zonas/claves${level !== 'native' && (plotType === 'box' || plotType === 'bar') ? ' (agregadas a paso ' + LEVEL_ES[level] + ')' : ''}`, font: { size: 13 } },
+            yaxis: { title: units },
+            xaxis: plotType === 'curves' ? { type: 'date', tickformat: '%d %b' } : plotType === 'profile' ? { title: 'Hora del día', dtick: 3, range: [0, 23] } : { tickangle: -45 },
+            showlegend: (plotType === 'box' || plotType === 'curves' || plotType === 'profile') && !panels,
+            legend: { orientation: 'h', font: { size: 10 } }
+        });
+        let h = 520;
+        if (panels) {
+            // Un panel por zona, misma escala vertical para comparar
+            const n = traces.length, gap = 0.035, ph = (1 - gap * (n - 1)) / n;
+            let lo = Infinity, hi = -Infinity;
+            traces.forEach(t => t.y.forEach(q => { if (q != null) { lo = Math.min(lo, q); hi = Math.max(hi, q); } }));
+            const pad = (hi - lo) * 0.08 || 1;
+            const ann = [];
+            traces.forEach((t, i) => {
+                const k = i === 0 ? 'yaxis' : 'yaxis' + (i + 1);
+                const d0 = 1 - (i + 1) * ph - i * gap, d1 = 1 - i * ph - i * gap;
+                layout[k] = Object.assign({}, layout.yaxis, { domain: [Math.max(0, d0), d1], range: [lo - pad, hi + pad], anchor: 'x', nticks: 4 });
+                layout[k].title = { text: t.name.length > 22 ? t.name.slice(0, 21) + '…' : t.name, font: { size: 10, color: t.line.color } };
+            });
+            layout.title.text += ` · ${esc(units)} (misma escala en todos los paneles)`;
+            layout.xaxis = Object.assign({}, layout.xaxis, { anchor: 'y' + (n === 1 ? '' : n) });
+            h = Math.max(420, 130 * n + 120);
+        }
+        if (el.style.height !== h + 'px') { try { Plotly.purge(el); } catch (e) {} el.style.height = h + 'px'; }
+        Plotly.react(el, traces, layout, PLOTLY_CFG);
         hideLoading();
     }, 60);
 }

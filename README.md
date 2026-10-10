@@ -20,8 +20,8 @@ scripts/validate.js                Validación previa a la compilación
 1. Suba esta carpeta a un repositorio de GitHub.
 2. **Versión publicada:** cree y suba una etiqueta; el flujo compila y adjunta el `.exe` a un Release.
    ```
-   git tag v2.4.0
-   git push origin v2.4.0
+   git tag v2.5.0
+   git push origin v2.5.0
    ```
 3. **Prueba sin publicar:** pestaña *Actions* → *Compilar Windows x64* → *Run workflow*. Los `.exe` quedan en *Artifacts* de esa ejecución.
 
