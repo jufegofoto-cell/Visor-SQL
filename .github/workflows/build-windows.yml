@@ -2,8 +2,8 @@ name: Compilar Windows x64
 
 on:
   push:
-    tags: ['v*']        # ej.: git tag v2.3.0 && git push origin v2.3.0  → compila y publica en Releases
-  workflow_dispatch:     # ejecución manual desde la pestaña Actions (deja el .exe como artefacto)
+    tags: ['v*']        # crear el Release v2.4.0 (o la etiqueta) compila y publica los dos .exe
+  workflow_dispatch:     # ejecución manual desde la pestaña Actions (deja los .exe como artefactos)
 
 permissions:
   contents: write
@@ -13,10 +13,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Descargar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Instalar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -31,21 +31,30 @@ jobs:
       - name: Validar HTML
         run: npm run validate
 
-      - name: Compilar ejecutable portable (x64)
+      - name: Compilar ejecutable portable e instalador (x64)
         run: npm run dist
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false   # sin certificado de firma de código
 
-      - name: Guardar artefacto
-        uses: actions/upload-artifact@v4
+      - name: Guardar ejecutable portable
+        uses: actions/upload-artifact@v7
         with:
-          name: VisorSQL-EnergyPlus-win-x64
-          path: dist/*.exe
+          name: VisorSQL-EnergyPlus-portable-x64
+          path: dist/*-portable-x64.exe
+          if-no-files-found: error
+
+      - name: Guardar instalador
+        uses: actions/upload-artifact@v7
+        with:
+          name: VisorSQL-EnergyPlus-instalador-x64
+          path: dist/*-instalador-x64.exe
           if-no-files-found: error
 
       - name: Publicar en GitHub Releases
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          files: dist/*.exe
+          files: |
+            dist/*-portable-x64.exe
+            dist/*-instalador-x64.exe
           generate_release_notes: true
